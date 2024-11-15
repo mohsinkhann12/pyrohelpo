@@ -3,7 +3,7 @@ import importlib
 from typing import List, Dict, Any
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
-from .helpers import chunk_list, create_pagination_keyboard
+from Helpo.helpers import chunk_list, create_pagination_keyboard
 
 class Helpo:
     def __init__(self, client: Client, modules_path: str):
@@ -18,10 +18,10 @@ class Helpo:
             if filename.endswith('.py') and not filename.startswith('__'):
                 module_name = filename[:-3]
                 module = importlib.import_module(f"{self.modules_path.replace('/', '.')}.{module_name}")
-                if hasattr(module, 'MODULE') and hasattr(module, 'HELP'):
-                    self.modules[module.MODULE] = {
-                        'name': module.MODULE,
-                        'help': module.HELP
+                if hasattr(module, '__MODULE__') and hasattr(module, '__HELP__'):
+                    self.modules[module.__MODULE__] = {
+                        'name': module.__MODULE__,
+                        'help': module.__HELP__
                     }
         print(f"Loaded {len(self.modules)} modules: {', '.join(self.modules.keys())}")
 
@@ -44,6 +44,10 @@ class Helpo:
                 await self.show_help_menu(callback_query.message.chat.id, page, callback_query.message.id)
             elif data[1] == 'back':
                 await self.show_help_menu(callback_query.message.chat.id, message_id=callback_query.message.id)
+
+        @self.client.on_callback_query(filters.regex(r'^global_help$'))
+        async def global_help_button(client, callback_query: CallbackQuery):
+            await self.global_help(callback_query.message.chat.id, callback_query.message.id)
 
     async def show_help_menu(self, chat_id: int, page: int = 1, message_id: int = None):
         modules_list = list(self.modules.keys())
