@@ -3,7 +3,7 @@ import importlib
 from typing import List, Dict, Any
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
-from Helpo.helpers import chunk_list, create_pagination_keyboard
+from .helpers import chunk_list, create_pagination_keyboard
 
 class Helpo:
     def __init__(self, client: Client, modules_path: str):
@@ -18,10 +18,10 @@ class Helpo:
             if filename.endswith('.py') and not filename.startswith('__'):
                 module_name = filename[:-3]
                 module = importlib.import_module(f"{self.modules_path.replace('/', '.')}.{module_name}")
-                if hasattr(module, '__MODULE__') and hasattr(module, '__HELP__'):
-                    self.modules[module.__MODULE__] = {
-                        'name': module.__MODULE__,
-                        'help': module.__HELP__
+                if hasattr(module, 'MODULE') and hasattr(module, 'HELP'):
+                    self.modules[module.MODULE] = {
+                        'name': module.MODULE,
+                        'help': module.HELP
                     }
         print(f"Loaded {len(self.modules)} modules: {', '.join(self.modules.keys())}")
 
