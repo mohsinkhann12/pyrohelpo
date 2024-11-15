@@ -36,9 +36,10 @@ class Helpo:
 
         @self.client.on_message(filters.command("start"))
         async def start_command(client, message):
-            args = message.text.split()
-            if len(args) > 1 and args[1] == "help":
-                await self.show_help_menu(message.chat.id)
+            if len(message.text.split()) >1:
+                name = message.text.split(None, 1)[1]
+                if name[0:4] == "help":
+                    await self.show_help_menu(message.chat.id)
             else:
                 pass
 
