@@ -5,10 +5,14 @@ from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
 from Helpo.helpers import chunk_list, create_pagination_keyboard
 
+
 class Helpo:
-    def __init__(self, client: Client, modules_path: str):
+    def __init__(self, client: Client, modules_path: str, buttons_per_page: int = 6, help_var: str = "__HELP__", module_var: str = "__MODULE__"):
         self.client = client
         self.modules_path = modules_path
+        self.buttons_per_page = buttons_per_page
+        self.help_var = help_var
+        self.module_var = module_var
         self.modules: Dict[str, Dict[str, Any]] = {}
         self.load_modules()
         self.monkeypatch_client()
@@ -18,10 +22,10 @@ class Helpo:
             if filename.endswith('.py') and not filename.startswith('__'):
                 module_name = filename[:-3]
                 module = importlib.import_module(f"{self.modules_path.replace('/', '.')}.{module_name}")
-                if hasattr(module, '__MODULE__') and hasattr(module, '__HELP__'):
-                    self.modules[module.__MODULE__] = {
-                        'name': module.__MODULE__,
-                        'help': module.__HELP__
+                if hasattr(module, self.module_var) and hasattr(module, self.help_var):
+                    self.modules[getattr(module, self.module_var, module_name)] = {
+                        'name': getattr(module, self.module_var, module_name),
+                        'help': getattr(module, self.help_var, "No help available for this module.")
                     }
         print(f"Loaded {len(self.modules)} modules: {', '.join(self.modules.keys())}")
 
@@ -30,6 +34,12 @@ class Helpo:
         async def help_command(client, message):
             await self.show_help_menu(message.chat.id)
 
+        @self.client.on_message(filters.command("start"))
+        async def start_command(client, message):
+            if len(message.command) > 1 and message.command[1] == "help":
+                await self.show_help_menu(message.chat.id)
+            else:
+                return 
         @self.client.on_callback_query(filters.regex(r'^help_'))
         async def help_button(client, callback_query: CallbackQuery):
             data = callback_query.data.split('_')
@@ -45,13 +55,9 @@ class Helpo:
             elif data[1] == 'back':
                 await self.show_help_menu(callback_query.message.chat.id, message_id=callback_query.message.id)
 
-        @self.client.on_callback_query(filters.regex(r'^global_help$'))
-        async def global_help_button(client, callback_query: CallbackQuery):
-            await self.global_help(callback_query.message.chat.id, callback_query.message.id)
-
     async def show_help_menu(self, chat_id: int, page: int = 1, message_id: int = None):
         modules_list = list(self.modules.keys())
-        chunks = list(chunk_list(modules_list, 6))
+        chunks = list(chunk_list(modules_list, self.buttons_per_page))
         
         if not chunks:
             text = "No modules loaded."
@@ -64,7 +70,7 @@ class Helpo:
             
             keyboard = create_pagination_keyboard(chunks[page-1], page, len(chunks))
             
-            text = f"**📚 Help Menu**\n\nLoaded {len(self.modules)} modules: {', '.join(self.modules.keys())}\n\nClick on a module to see its help message."
+            text = f"**📚 Help Menu**\n\nLoaded {len(self.modules)} modules:\n{', '.join(self.modules.keys())}\n\nClick on a module to see its help message."
         
         if message_id:
             await self.client.edit_message_text(chat_id, message_id, text, reply_markup=keyboard)
@@ -82,7 +88,5 @@ class Helpo:
         else:
             await callback_query.answer("Module not found!", show_alert=True)
 
-    async def global_help(self, chat_id: int, message_id: int):
-        await self.show_help_menu(chat_id, message_id=message_id)
 
 print("Helpo core module loaded")
