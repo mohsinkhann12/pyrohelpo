@@ -3,7 +3,7 @@ import importlib
 from typing import List, Dict, Any
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
-from .helpers import chunk_list, create_pagination_keyboard
+from Helpo.helpers import chunk_list, create_pagination_keyboard
 
 class Helpo:
     def __init__(self, client: Client, modules_path: str):
