@@ -36,10 +36,12 @@ class Helpo:
 
         @self.client.on_message(filters.command("start"))
         async def start_command(client, message):
-            if len(message.command) > 1 and message.command[1] == "help":
+            args = message.text.split()
+            if len(args) > 1 and args[1] == "help":
                 await self.show_help_menu(message.chat.id)
             else:
-                return 
+                pass
+
         @self.client.on_callback_query(filters.regex(r'^help_'))
         async def help_button(client, callback_query: CallbackQuery):
             data = callback_query.data.split('_')
@@ -54,6 +56,10 @@ class Helpo:
                 await self.show_help_menu(callback_query.message.chat.id, page, callback_query.message.id)
             elif data[1] == 'back':
                 await self.show_help_menu(callback_query.message.chat.id, message_id=callback_query.message.id)
+
+        @self.client.on_callback_query(filters.regex(r'^global_help$'))
+        async def global_help(client, callback_query: CallbackQuery):
+            await self.show_help_menu(callback_query.message.chat.id, message_id=callback_query.message.id)
 
     async def show_help_menu(self, chat_id: int, page: int = 1, message_id: int = None):
         modules_list = list(self.modules.keys())
