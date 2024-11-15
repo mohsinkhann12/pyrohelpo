@@ -107,6 +107,5 @@ class Helpo:
         else:
             await callback_query.answer("Module not found!", show_alert=True)
 
-    @staticmethod
     async def deep_linking(chat_id: int):
         await self.show_help_menu(chat_id)
