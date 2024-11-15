@@ -1,5 +1,5 @@
 from pyrogram import Client, filters
-from Helpo import Helpo, module_help
+from PyroHelpo import Helpo, module_help
 
 app = Client("my_bot")
 pagination = Helpo(app, "Bot/modules")
