@@ -75,7 +75,9 @@ class Helpo:
         async def global_help(client, callback_query: CallbackQuery):
             await self.show_help_menu(callback_query.message.chat.id, message_id=callback_query.message.id)
             
-
+    async def deep_linking(self, chat_id: int):
+        await self.show_help_menu(chat_id)
+        
     async def show_help_menu(self, chat_id: int, page: int = 1, message_id: int = None):
         modules_list = list(self.modules.keys())
         chunks = list(chunk_list(modules_list, self.buttons_per_page))
@@ -111,6 +113,3 @@ class Helpo:
             await callback_query.edit_message_text(text, reply_markup=keyboard)
         else:
             await callback_query.answer("Module not found!", show_alert=True)
-
-    async def deep_linking(chat_id: int):
-        await self.show_help_menu(chat_id)
