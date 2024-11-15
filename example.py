@@ -2,7 +2,7 @@ from pyrogram import Client, filters
 from Helpo import Helpo, module_help
 
 app = Client("my_bot")
-pagination = PyroPagination(app, "Bot/modules")
+pagination = Helpo(app, "Bot/modules")
 
 @module_help("AFK")
 @app.on_message(filters.command("afk"))
