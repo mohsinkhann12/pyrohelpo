@@ -23,6 +23,7 @@ class Helpo:
                         'name': module.__MODULE__,
                         'help': module.__HELP__
                     }
+        print(f"Loaded {len(self.modules)} modules: {', '.join(self.modules.keys())}")
 
     def monkeypatch_client(self):
         @self.client.on_message(filters.command("help"))
@@ -48,14 +49,18 @@ class Helpo:
         modules_list = list(self.modules.keys())
         chunks = list(chunk_list(modules_list, 6))
         
-        if page > len(chunks):
-            page = 1
-        elif page < 1:
-            page = len(chunks)
-        
-        keyboard = create_pagination_keyboard(chunks[page-1], page, len(chunks))
-        
-        text = "**📚 Help Menu**\n\nClick on a module to see its help message."
+        if not chunks:
+            text = "No modules loaded."
+            keyboard = InlineKeyboardMarkup([[InlineKeyboardButton("👥 Support", url="https://t.me/Xlzeo")]])
+        else:
+            if page > len(chunks):
+                page = 1
+            elif page < 1:
+                page = len(chunks)
+            
+            keyboard = create_pagination_keyboard(chunks[page-1], page, len(chunks))
+            
+            text = f"**📚 Help Menu**\n\nLoaded {len(self.modules)} modules: {', '.join(self.modules.keys())}\n\nClick on a module to see its help message."
         
         if message_id:
             await self.client.edit_message_text(chat_id, message_id, text, reply_markup=keyboard)
