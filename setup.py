@@ -4,7 +4,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
-    name="PyroHelpo",
+    name="pyrohelpo",
     version="2.3.1",
     author="Vishal-1756",
     author_email="vishalborse199@gmail.com",
