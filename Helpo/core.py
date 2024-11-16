@@ -74,9 +74,7 @@ class Helpo:
         @self.client.on_callback_query(filters.regex(r'^global_help$'))
         async def global_help(client, callback_query: CallbackQuery):
             await self.show_help_menu(callback_query.message.chat.id, message_id=callback_query.message.id)
-            
-    async def deep_linking(self, chat_id: int):
-        await self.show_help_menu(chat_id)
+              
         
     async def show_help_menu(self, chat_id: int, page: int = 1, message_id: int = None):
         modules_list = list(self.modules.keys())
