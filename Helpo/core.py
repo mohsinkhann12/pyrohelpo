@@ -69,7 +69,7 @@ class Helpo:
                     }
                 except Exception as e:
                     print(f"Failed to load module {module_name}: {str(e)}")
-    print(f"Loaded {len(self.modules)} modules: {', '.join(self.modules.keys())}")
+        print(f"Loaded {len(self.modules)} modules: {', '.join(self.modules.keys())}")
     
     def monkeypatch_client(self):
         @self.client.on_message(filters.command("help"))
