@@ -59,21 +59,18 @@ class Helpo:
                 module_name = filename[:-3]
                 try:
                     module = importlib.import_module(f"{self.modules_path.replace('/', '.')}.{module_name}")
-                    if not hasattr(module, self.help_var):
-                        raise ValueError(f"Module {module_name} is missing the required attribute '{self.help_var}'.")
-                    if not hasattr(module, self.module_var):
-                        raise ValueError(f"Module {module_name} is missing the required attribute '{self.module_var}'.")
-                    if hasattr(module, self.module_var) and hasattr(module, self.help_var):
-                        self.modules[getattr(module, self.module_var, module_name)] = {
-                            'name': getattr(module, self.module_var, module_name),
-                            'help': getattr(module, self.help_var, "No help available for this module.")
-                        }                        
-                    else:
-                        print(f"Module {module_name} is missing required attributes, use module var first and later help var")
+                    if not hasattr(module, self.help_var) or not hasattr(module, self.module_var):
+                        missing_attr = self.help_var if not hasattr(module, self.help_var) else self.module_var
+                        raise ValueError(f"Module {module_name} is missing the required attribute '{missing_attr}'.")
+                
+                    self.modules[getattr(module, self.module_var)] = {
+                        'name': getattr(module, self.module_var),
+                        'help': getattr(module, self.help_var)
+                    }
                 except Exception as e:
                     print(f"Failed to load module {module_name}: {str(e)}")
-        print(f"Loaded {len(self.modules)} modules: {', '.join(self.modules.keys())}")
-
+    print(f"Loaded {len(self.modules)} modules: {', '.join(self.modules.keys())}")
+    
     def monkeypatch_client(self):
         @self.client.on_message(filters.command("help"))
         async def help_command(client, message):
