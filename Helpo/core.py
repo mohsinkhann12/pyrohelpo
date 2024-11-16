@@ -11,6 +11,8 @@ from pyrogram import types
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
+logger.info(f"Helpo Working Perfectly! If You Liked Our Library Star our repo: https://github.com/Vishal-1756/Helpo")
+
 class Helpo:
     def __init__(
         self,
@@ -51,8 +53,7 @@ class Helpo:
         self.modules: Dict[str, Dict[str, Any]] = {}
         self.load_modules()
         self.monkeypatch_client()
-        logger.info("Helpo initialized successfully")
-        logger.info(f"⭐ Star our repo: GitHub.com/Vishal-1756/Helpo")
+                
         logger.info(f"Loaded {len(self.modules)} modules: {', '.join(self.modules.keys())}")
 
     def load_modules(self):
@@ -65,8 +66,7 @@ class Helpo:
                         self.modules[getattr(module, self.module_var, module_name)] = {
                             'name': getattr(module, self.module_var, module_name),
                             'help': getattr(module, self.help_var, "No help available for this module.")
-                        }
-                        logger.info(f"Loaded module: {module_name}")
+                        }                        
                     else:
                         logger.warning(f"Module {module_name} is missing required attributes")
                 except Exception as e:
