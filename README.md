@@ -19,7 +19,7 @@ A powerful and flexible pagination library for Pyrogram bots that automatically 
 ## Installation 🚀
 
 ```bash
-pip install Helpo
+pip install pyrohelpo
 ```
 
 ## Usage ⚙️
