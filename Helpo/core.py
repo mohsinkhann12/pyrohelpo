@@ -6,6 +6,7 @@ from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery, Message
 from Helpo.helpers import chunk_list, create_pagination_keyboard
 from pyrogram.enums import ParseMode
+from pyrogram import types
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -138,7 +139,7 @@ class Helpo:
                     await self.client.edit_message_media(
                         chat_id=chat_id,
                         message_id=message_id,
-                        media=self.client.types.InputMediaPhoto(media=self.photo, caption=text),
+                        media=types.InputMediaPhoto(media=self.photo, caption=text),
                         reply_markup=reply_markup
                     )
                 else:
@@ -154,7 +155,7 @@ class Helpo:
                     await self.client.edit_message_media(
                         chat_id=chat_id,
                         message_id=message_id,
-                        media=self.client.types.InputMediaVideo(media=self.video, caption=text),
+                        media=types.InputMediaVideo(media=self.video, caption=text),
                         reply_markup=reply_markup
                     )
                 else:
