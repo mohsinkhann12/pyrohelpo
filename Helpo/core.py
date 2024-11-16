@@ -59,6 +59,10 @@ class Helpo:
                 module_name = filename[:-3]
                 try:
                     module = importlib.import_module(f"{self.modules_path.replace('/', '.')}.{module_name}")
+                    if not hasattr(module, self.help_var):
+                        raise ValueError(f"Module {module_name} is missing the required attribute '{self.help_var}'.")
+                    if not hasattr(module, self.module_var):
+                        raise ValueError(f"Module {module_name} is missing the required attribute '{self.module_var}'.")
                     if hasattr(module, self.module_var) and hasattr(module, self.help_var):
                         self.modules[getattr(module, self.module_var, module_name)] = {
                             'name': getattr(module, self.module_var, module_name),
