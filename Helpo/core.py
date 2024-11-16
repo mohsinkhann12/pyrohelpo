@@ -1,6 +1,5 @@
 import os
 import importlib
-import logging
 from typing import List, Dict, Any, Optional
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery, Message
@@ -8,10 +7,7 @@ from Helpo.helpers import chunk_list, create_pagination_keyboard
 from pyrogram.enums import ParseMode
 from pyrogram import types
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
-
-logger.info(f"Helpo Working Perfectly! If You Liked Our Library Star our repo: https://github.com/Vishal-1756/Helpo")
+print(f"Helpo Working Perfectly! If You Liked Our Library Star our repo: https://github.com/Vishal-1756/Helpo")
 
 class Helpo:
     def __init__(
@@ -27,6 +23,8 @@ class Helpo:
         parse_mode: Optional[str] = None,
         disable_web_page_preview: bool = True
     ):
+        if photo and video:
+            raise ValueError("You can only set either 'photo' or 'video' attribute to Helpo")
         self.client = client
         self.modules_path = modules_path
         self.buttons_per_page = buttons_per_page
@@ -54,7 +52,6 @@ class Helpo:
         self.load_modules()
         self.monkeypatch_client()
                 
-        logger.info(f"Loaded {len(self.modules)} modules: {', '.join(self.modules.keys())}")
 
     def load_modules(self):
         for filename in os.listdir(self.modules_path):
@@ -68,10 +65,10 @@ class Helpo:
                             'help': getattr(module, self.help_var, "No help available for this module.")
                         }                        
                     else:
-                        logger.warning(f"Module {module_name} is missing required attributes")
+                        print(f"Module {module_name} is missing required attributes, use module var first and later help var")
                 except Exception as e:
-                    logger.error(f"Failed to load module {module_name}: {str(e)}")
-        logger.info(f"Loaded {len(self.modules)} modules: {', '.join(self.modules.keys())}")
+                    print(f"Failed to load module {module_name}: {str(e)}")
+        print(f"Loaded {len(self.modules)} modules: {', '.join(self.modules.keys())}")
 
     def monkeypatch_client(self):
         @self.client.on_message(filters.command("help"))
@@ -185,4 +182,4 @@ class Helpo:
                         disable_web_page_preview=self.disable_web_page_preview
                     )
         except Exception as e:
-            logger.error(f"Failed to send help message to chat {chat_id}: {str(e)}")
+            print(f"Failed to send help message to chat {chat_id}: {str(e)}")
