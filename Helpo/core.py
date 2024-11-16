@@ -1,10 +1,13 @@
 import os
 import importlib
-from typing import List, Dict, Any
+import logging
+from typing import List, Dict, Any, Optional
 from pyrogram import Client, filters
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery, Message
 from Helpo.helpers import chunk_list, create_pagination_keyboard
 
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 class Helpo:
     def __init__(
@@ -14,13 +17,21 @@ class Helpo:
         buttons_per_page: int = 6,
         help_var: str = "__HELP__",
         module_var: str = "__MODULE__",
-        texts: Dict[str, str] = None
+        texts: Dict[str, str] = None,
+        photo: Optional[str] = None,
+        video: Optional[str] = None,
+        parse_mode: Optional[str] = None,
+        disable_web_page_preview: bool = True
     ):
         self.client = client
         self.modules_path = modules_path
         self.buttons_per_page = buttons_per_page
         self.help_var = help_var
         self.module_var = module_var
+        self.photo = photo
+        self.video = video
+        self.parse_mode = parse_mode or ParseMode.MARKDOWN
+        self.disable_web_page_preview = disable_web_page_preview
         self.texts = {
             "help_menu_title": "**📚 Help Menu**",
             "help_menu_intro": "Loaded {count} modules:\n{modules}\n\nClick on a module to see its help message.",
@@ -38,18 +49,27 @@ class Helpo:
         self.modules: Dict[str, Dict[str, Any]] = {}
         self.load_modules()
         self.monkeypatch_client()
+        logger.info("Helpo initialized successfully")
+        logger.info(f"⭐ Star our repo: GitHub.com/Vishal-1756/Helpo")
+        logger.info(f"Loaded {len(self.modules)} modules: {', '.join(self.modules.keys())}")
 
     def load_modules(self):
         for filename in os.listdir(self.modules_path):
             if filename.endswith('.py') and not filename.startswith('__'):
                 module_name = filename[:-3]
-                module = importlib.import_module(f"{self.modules_path.replace('/', '.')}.{module_name}")
-                if hasattr(module, self.module_var) and hasattr(module, self.help_var):
-                    self.modules[getattr(module, self.module_var, module_name)] = {
-                        'name': getattr(module, self.module_var, module_name),
-                        'help': getattr(module, self.help_var, "No help available for this module.")
-                    }
-        print(f"Loaded {len(self.modules)} modules: {', '.join(self.modules.keys())}")
+                try:
+                    module = importlib.import_module(f"{self.modules_path.replace('/', '.')}.{module_name}")
+                    if hasattr(module, self.module_var) and hasattr(module, self.help_var):
+                        self.modules[getattr(module, self.module_var, module_name)] = {
+                            'name': getattr(module, self.module_var, module_name),
+                            'help': getattr(module, self.help_var, "No help available for this module.")
+                        }
+                        logger.info(f"Loaded module: {module_name}")
+                    else:
+                        logger.warning(f"Module {module_name} is missing required attributes")
+                except Exception as e:
+                    logger.error(f"Failed to load module {module_name}: {str(e)}")
+        logger.info(f"Loaded {len(self.modules)} modules: {', '.join(self.modules.keys())}")
 
     def monkeypatch_client(self):
         @self.client.on_message(filters.command("help"))
@@ -97,10 +117,7 @@ class Helpo:
 
             text = f"{self.texts['help_menu_title']}\n\n{self.texts['help_menu_intro'].format(count=len(self.modules), modules=', '.join(self.modules.keys()))}"
 
-        if message_id:
-            await self.client.edit_message_text(chat_id, message_id, text, reply_markup=keyboard)
-        else:
-            await self.client.send_message(chat_id, text, reply_markup=keyboard)
+        await self.send_message(chat_id, text, reply_markup=keyboard, message_id=message_id)
 
     async def show_module_help(self, callback_query: CallbackQuery, module_name: str):
         module = self.modules.get(module_name)
@@ -112,3 +129,58 @@ class Helpo:
             await callback_query.edit_message_text(text, reply_markup=keyboard)
         else:
             await callback_query.answer("Module not found!", show_alert=True)
+
+    async def send_message(self, chat_id: int, text: str, reply_markup: InlineKeyboardMarkup = None, message_id: int = None):
+        try:
+            if self.photo:
+                if message_id:
+                    await self.client.edit_message_media(
+                        chat_id=chat_id,
+                        message_id=message_id,
+                        media=self.client.types.InputMediaPhoto(media=self.photo, caption=text),
+                        reply_markup=reply_markup
+                    )
+                else:
+                    await self.client.send_photo(
+                        chat_id=chat_id,
+                        photo=self.photo,
+                        caption=text,
+                        reply_markup=reply_markup,
+                        parse_mode=self.parse_mode
+                    )
+            elif self.video:
+                if message_id:
+                    await self.client.edit_message_media(
+                        chat_id=chat_id,
+                        message_id=message_id,
+                        media=self.client.types.InputMediaVideo(media=self.video, caption=text),
+                        reply_markup=reply_markup
+                    )
+                else:
+                    await self.client.send_video(
+                        chat_id=chat_id,
+                        video=self.video,
+                        caption=text,
+                        reply_markup=reply_markup,
+                        parse_mode=self.parse_mode
+                    )
+            else:
+                if message_id:
+                    await self.client.edit_message_text(
+                        chat_id=chat_id,
+                        message_id=message_id,
+                        text=text,
+                        reply_markup=reply_markup,
+                        parse_mode=self.parse_mode,
+                        disable_web_page_preview=self.disable_web_page_preview
+                    )
+                else:
+                    await self.client.send_message(
+                        chat_id=chat_id,
+                        text=text,
+                        reply_markup=reply_markup,
+                        parse_mode=self.parse_mode,
+                        disable_web_page_preview=self.disable_web_page_preview
+                    )
+        except Exception as e:
+            logger.error(f"Failed to send help message to chat {chat_id}: {str(e)}")
