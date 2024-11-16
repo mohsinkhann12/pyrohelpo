@@ -52,8 +52,8 @@ pagination = Helpo(
     video="" # pass video path/url 
     photo="" # pass photo path/url
     # only one type of media support at one time pass photo else video to use them in /help command 
-    parse_mode="ParseMode.HTML" # pass if want to change parse mode Default to markdown         
-    disable_web_page_priview=False # Deafuults to True
+    parse_mode=ParseMode.HTML # pass if want to change parse mode Default to markdown         
+    disable_web_page_preview=False # Deafuults to True
 )
 ```
 
