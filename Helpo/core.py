@@ -75,6 +75,7 @@ class Helpo:
         async def global_help(client, callback_query: CallbackQuery):
             await self.show_help_menu(callback_query.message.chat.id, message_id=callback_query.message.id)
               
+        self.client.show_help_menu = self.show_help_menu
         
     async def show_help_menu(self, chat_id: int, page: int = 1, message_id: int = None):
         modules_list = list(self.modules.keys())
