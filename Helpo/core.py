@@ -5,6 +5,7 @@ from typing import List, Dict, Any, Optional
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery, Message
 from Helpo.helpers import chunk_list, create_pagination_keyboard
+from pyrogram.enums import ParseMode
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
