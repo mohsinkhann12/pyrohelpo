@@ -49,6 +49,9 @@ pagination = Helpo(
     texts=custom_texts,
     help_var="HELP",
     module_var="MODULE",
+    video="" # pass video path/url 
+    photo="" # pass photo path/url
+    # only one type of media support at one time pass photo else video to use them in /help command 
 )
 ```
 
