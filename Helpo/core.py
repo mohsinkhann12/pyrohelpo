@@ -20,7 +20,7 @@ class Helpo:
         texts: Dict[str, str] = None,
         photo: Optional[str] = None,
         video: Optional[str] = None,
-        parse_mode: Optional[str] = None,
+        parse_mode: Optional[ParseMode] = ParseMode.MARKDOWN,
         disable_web_page_preview: bool = True
     ):
         if photo and video:
@@ -32,7 +32,7 @@ class Helpo:
         self.module_var = module_var
         self.photo = photo
         self.video = video
-        self.parse_mode = parse_mode or ParseMode.MARKDOWN
+        self.parse_mode = parse_mode
         self.disable_web_page_preview = disable_web_page_preview
         self.texts = {
             "help_menu_title": "**📚 Help Menu**",
