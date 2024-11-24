@@ -46,7 +46,7 @@ class Helpo:
             "support_button": "👥 Support",
             "support_url": "https://t.me/Xlzeo",
             "group_help_message": "Click The Button To Access Help",
-            "group_pvt_button" : "See In Pvt",
+            "group_pvt_button": "See In Pvt",
             "group_pvt_url": "https://t.me/{(self.client.get_me()).username}?start=help",
             "group_open_here": "Open Here"
         }
@@ -55,7 +55,6 @@ class Helpo:
         self.modules: Dict[str, Dict[str, Any]] = {}
         self.load_modules()
         self.monkeypatch_client()
-                
 
     def load_modules(self):
         for filename in os.listdir(self.modules_path):
@@ -83,7 +82,7 @@ class Helpo:
                     [
                         InlineKeyboardButton(
                             self.texts["group_pvt_button"],
-                            url=fself.texts["group_pvt_url"]
+                            url=self.texts["group_pvt_url"]
                         ),
                         InlineKeyboardButton(
                             self.texts["group_open_here"],
@@ -206,4 +205,4 @@ class Helpo:
                         disable_web_page_preview=self.disable_web_page_preview
                     )
         except Exception as e:
-            print(f"Failed to send help message to chat {chat_id}: {str(e)}")
+            print(f"Failed to send help message to chat {chat_id}: {str(e)}") 
