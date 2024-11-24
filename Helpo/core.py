@@ -4,7 +4,7 @@ from typing import List, Dict, Any, Optional
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery, Message
 from Helpo.helpers import chunk_list, create_pagination_keyboard
-from pyrogram.enums import ParseMode
+from pyrogram.enums import ParseMode, ChatType
 from pyrogram import types
 
 print(f"Helpo Working Perfectly! If You Liked Our Library Star our repo: https://github.com/Vishal-1756/Helpo")
@@ -77,7 +77,7 @@ class Helpo:
     def monkeypatch_client(self):
         @self.client.on_message(filters.command("help"))
         async def help_command(client, message):
-            if message.chat.type == "ChatType.SUPERGROUP":
+            if message.chat.type in [ChatType.SUPERGROUP, ChatType.GROUP]:
                 buttons = [
                     [
                         InlineKeyboardButton(
