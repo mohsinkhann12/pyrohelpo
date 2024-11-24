@@ -4,18 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pyro Helpo Documentation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-        /* CSS styles */
+        :root {
+            --primary-color: #6200ea;
+            --secondary-color: #03dac6;
+            --background-color: #121212;
+            --surface-color: #1e1e1e;
+            --on-surface-color: #ffffff;
+            --text-color: #ffffff;
+            --code-background: #2d2d2d;
+        }
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Roboto', sans-serif;
             line-height: 1.6;
-            color: #ffffff;
-            background-color: #000000;
+            color: var(--text-color);
+            background-color: var(--background-color);
             overflow-x: hidden;
         }
         #stars {
@@ -27,66 +36,120 @@
             z-index: -1;
         }
         .container {
-            width: 80%;
+            width: 90%;
+            max-width: 1200px;
             margin: auto;
             overflow: hidden;
             padding: 20px;
         }
         header {
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.8);
             padding: 1rem;
             position: fixed;
             width: 100%;
             top: 0;
             z-index: 1000;
+            backdrop-filter: blur(5px);
         }
         nav ul {
             list-style-type: none;
+            display: flex;
+            justify-content: center;
         }
         nav ul li {
-            display: inline;
-            margin-right: 20px;
+            margin: 0 15px;
         }
         nav ul li a {
-            color: #ffffff;
+            color: var(--text-color);
             text-decoration: none;
             font-weight: bold;
+            transition: color 0.3s ease;
+        }
+        nav ul li a:hover {
+            color: var(--secondary-color);
         }
         main {
             margin-top: 80px;
         }
         section {
             margin-bottom: 50px;
+            background: var(--surface-color);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         h1, h2, h3 {
             margin-bottom: 20px;
+            color: var(--secondary-color);
         }
-        pre {
-            background: #1a1a1a;
+        h1 {
+            font-size: 2.5em;
+            text-align: center;
+        }
+        h2 {
+            font-size: 2em;
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 10px;
+        }
+        h3 {
+            font-size: 1.5em;
+        }
+        p {
+            margin-bottom: 15px;
+        }
+        .code-block {
+            position: relative;
+            background: var(--code-background);
             padding: 15px;
             border-radius: 5px;
             overflow-x: auto;
+            margin-bottom: 20px;
         }
         code {
             font-family: 'Courier New', Courier, monospace;
             color: #00ff00;
+            display: block;
+            white-space: pre-wrap;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: var(--primary-color);
+            color: var(--text-color);
+            border: none;
+            border-radius: 3px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 0.8em;
+            transition: background-color 0.3s ease;
+        }
+        .copy-btn:hover {
+            background-color: var(--secondary-color);
         }
         .gallery {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-around;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
         }
         .gallery img {
-            width: 45%;
-            margin-bottom: 20px;
+            width: 100%;
             border-radius: 5px;
+            transition: transform 0.3s ease;
+        }
+        .gallery img:hover {
+            transform: scale(1.05);
         }
         @media (max-width: 768px) {
             .container {
                 width: 95%;
             }
-            .gallery img {
-                width: 100%;
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+            }
+            nav ul li {
+                margin: 10px 0;
             }
         }
     </style>
@@ -99,6 +162,7 @@
                 <li><a href="#home">Home</a></li>
                 <li><a href="#installation">Installation</a></li>
                 <li><a href="#usage">Usage</a></li>
+                <li><a href="#customization">Customization</a></li>
                 <li><a href="#gallery">Gallery</a></li>
                 <li><a href="#examples">Examples</a></li>
             </ul>
@@ -111,14 +175,36 @@
         </section>
         <section id="installation">
             <h2>Installation</h2>
-            <pre><code>pip install pyrohelpo</code></pre>
+            <div class="code-block">
+                <button class="copy-btn">Copy</button>
+                <code>pip install pyrohelpo</code>
+            </div>
         </section>
         <section id="usage">
             <h2>Usage</h2>
-            <h3>Initialize the Helpo instance</h3>
-            <pre><code>
-from Helpo import Helpo                
+            <h3>Basic Setup</h3>
+            <div class="code-block">
+                <button class="copy-btn">Copy</button>
+                <code>
+from pyrogram import Client
+from Helpo import Helpo
+from pyrogram.enums import ParseMode
 
+# Initialize your Pyrogram client
+app = Client("my_bot")
+
+# Initialize Helpo
+helpo = Helpo(
+    client=app,
+    modules_path="plugins",
+    buttons_per_page=6
+)
+                </code>
+            </div>
+            <h3>Advanced Configuration</h3>
+            <div class="code-block">
+                <button class="copy-btn">Copy</button>
+                <code>
 custom_texts = {
     "help_menu_title": "**🛠 Custom Help Menu**",
     "help_menu_intro": "Available modules ({count}):\n{modules}\n\nTap on a module to explore.",
@@ -130,58 +216,51 @@ custom_texts = {
     "next_button": "➡️ Next Page",
     "support_button": "💬 Contact Support",
     "support_url": "https://t.me/YourSupportBot",
+    "group_help_message": "Click The Button To Access Help",
+    "group_pvt_button": "See In Private",
+    "group_open_here": "Open Here"
 }
 
-pagination = Helpo(
-    client=bot,
-    modules_path="fwd/plugins",
-    buttons_per_page=9,
+helpo = Helpo(
+    client=app,
+    modules_path="plugins",
+    buttons_per_page=6,
     texts=custom_texts,
     help_var="HELP",
     module_var="MODULE",
-    video="" # pass video path/url 
-    photo="" # pass photo path/url
-    # only one type of media support at one time pass photo else video to use them in /help command 
-    parse_mode=ParseMode.HTML # pass if want to change parse mode Default to markdown         
-    disable_web_page_preview=False # Deafuults to True                                          
+    photo="path/to/photo.jpg",  # Optional: Add photo to help messages
+    video="path/to/video.mp4",  # Optional: Add video to help messages
+    parse_mode=ParseMode.HTML,  # Optional: Change parse mode (default: MARKDOWN)
+    disable_web_page_preview=False  # Optional: Enable web preview (default: True)
 )
-            </code></pre>
-            <h3>Set up help and module for each Python file</h3>
-            <pre><code>
-MODULE = "HELPO"
-
-HELP = "GO GOA GONE"  # You can use docstrings too
-            </code></pre>
-            <h3>Using a custom class</h3>
-            <pre><code>
-from pyrogram import Client
-from Helpo import Helpo
-
-class Bot(Client):
-    def __init__(self):
-        super().__init__(
-            "Hoshi-new",
-            api_id=API_ID,
-            api_hash=API_HASH,
-            bot_token=TOKEN,
-            plugins=dict(root="shivu"),
-        )
-        self.helpo = Helpo(
-            client=self,
-            modules_path="shivu/modules",
-            buttons_per_page=6,
-            texts=custom_texts,
-        )
-
-    async def start(self):
-        await super().start()
-        print("Pyro Bot Started")
-        print(f"Helpo Initialized with Modules: {', '.join(self.helpo.modules.keys())}")
-
-    async def stop(self):
-        await super().stop()
-        print("Pyro Bot Stopped")
-            </code></pre>
+                </code>
+            </div>
+            <h3>Module Setup</h3>
+            <div class="code-block">
+                <button class="copy-btn">Copy</button>
+                <code>
+MODULE = "Admin"  # Module name displayed in help menu
+HELP = """
+**Admin Commands**
+/ban - Ban a user
+/unban - Unban a user
+/mute - Mute a user
+/unmute - Unmute a user
+"""
+                </code>
+            </div>
+        </section>
+        <section id="customization">
+            <h2>Customization Options</h2>
+            <p>Helpo offers various customization options to tailor the help menu to your bot's needs:</p>
+            <ul>
+                <li><code>buttons_per_page</code>: Set the number of buttons displayed per page (default: 6)</li>
+                <li><code>texts</code>: Customize all text messages and button labels</li>
+                <li><code>help_var</code> and <code>module_var</code>: Set custom variable names for help text and module names</li>
+                <li><code>photo</code> and <code>video</code>: Add rich media to your help messages</li>
+                <li><code>parse_mode</code>: Set the parse mode for help messages (default: ParseMode.MARKDOWN)</li>
+                <li><code>disable_web_page_preview</code>: Enable or disable web page previews in help messages</li>
+            </ul>
         </section>
         <section id="gallery">
             <h2>Gallery</h2>
@@ -194,31 +273,38 @@ class Bot(Client):
         </section>
         <section id="examples">
             <h2>Examples</h2>
-            <h3>Deep linking support</h3>
-            <pre><code>
-@bot.on_message(filters.command("start"))
+            <h3>Deep Linking Support</h3>
+            <div class="code-block">
+                <button class="copy-btn">Copy</button>
+                <code>
+@app.on_message(filters.command("start"))
 async def start_command(client, message):
     if len(message.text.split()) > 1:
-        name = message.text.split(None, 1)[1]
-        if name.startswith("help"):
-            await bot.show_help_menu(message.chat.id, page=1)
-            </code></pre>
-            <h3>Adding a help button anywhere without callback query</h3>
-            <pre><code>
+        param = message.text.split(None, 1)[1]
+        if param == "help":
+            await client.show_help_menu(message.chat.id)
+    else:
+        await message.reply("Welcome! Use /help to see available commands.")
+                </code>
+            </div>
+            <h3>Adding a Help Button</h3>
+            <div class="code-block">
+                <button class="copy-btn">Copy</button>
+                <code>
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from . import pagination  # Import your Helpo instance
 
-@bot.on_message(filters.command("start"))
+@app.on_message(filters.command("start"))
 async def start_command(client, message):
     keyboard = InlineKeyboardMarkup([
         [InlineKeyboardButton("Help", callback_data="global_help")]
     ])
     await message.reply("Welcome! Click the button below for help.", reply_markup=keyboard)
-            </code></pre>
+                </code>
+            </div>
         </section>
     </main>
     <script>
-        // JavaScript for star animation
+        // Improved 
         const canvas = document.getElementById('stars');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
@@ -231,15 +317,19 @@ async def start_command(client, message):
                 this.size = Math.random() * 2;
                 this.speedX = Math.random() * 3 - 1.5;
                 this.speedY = Math.random() * 3 - 1.5;
+                this.twinkleSpeed = Math.random() * 0.1;
+                this.twinklePhase = Math.random() * Math.PI * 2;
             }
             update() {
                 this.x += this.speedX;
                 this.y += this.speedY;
                 if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
                 if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+                this.twinklePhase += this.twinkleSpeed;
             }
             draw() {
-                ctx.fillStyle = 'white';
+                const twinkle = Math.sin(this.twinklePhase) * 0.5 + 0.5;
+                ctx.fillStyle = `rgba(255, 255, 255, ${twinkle})`;
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
                 ctx.fill();
@@ -247,7 +337,7 @@ async def start_command(client, message):
         }
 
         const stars = [];
-        for (let i = 0; i < 100; i++) {
+        for (let i = 0; i < 200; i++) {
             stars.push(new Star());
         }
 
@@ -265,6 +355,35 @@ async def start_command(client, message):
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         });
+
+        // Copy button
+        document.querySelectorAll('.copy-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const codeBlock = button.nextElementSibling;
+                const range = document.createRange();
+                range.selectNode(codeBlock);
+                window.getSelection().removeAllRanges();
+                window.getSelection().addRange(range);
+                document.execCommand('copy');
+                window.getSelection().removeAllRanges();
+                button.textContent = 'Copied!';
+                setTimeout(() => {
+                    button.textContent = 'Copy';
+                }, 2000);
+            });
+        });
+
+        // Smooth scrolling for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
     </script>
 </body>
 </html>
+
+ 
