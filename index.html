@@ -145,28 +145,54 @@
                 width: 95%;
             }
             nav ul {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: rgba(0, 0, 0, 0.9);
                 flex-direction: column;
                 align-items: center;
+                padding: 20px 0;
             }
-            nav ul li {
-                margin: 10px 0;
+            nav ul.show {
+                display: flex;
+            }
+            .menu-btn {
+                display: block;
             }
         }
+        header .container {
+            display: flex;
+            justify-content: flex-end;
+        }
+        .menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 1.5em;
+            cursor: pointer;
+        }
+
     </style>
 </head>
 <body>
     <canvas id="stars"></canvas>
     <header>
-        <nav>
-            <ul>
-                <li><a href="#home">Home</a></li>
-                <li><a href="#installation">Installation</a></li>
-                <li><a href="#usage">Usage</a></li>
-                <li><a href="#customization">Customization</a></li>
-                <li><a href="#gallery">Gallery</a></li>
-                <li><a href="#examples">Examples</a></li>
-            </ul>
-        </nav>
+        <div class="container">
+            <nav>
+                <button id="menuBtn" class="menu-btn">☰</button>
+                <ul id="navMenu">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#installation">Installation</a></li>
+                    <li><a href="#usage">Usage</a></li>
+                    <li><a href="#customization">Customization</a></li>
+                    <li><a href="#gallery">Gallery</a></li>
+                    <li><a href="#examples">Examples</a></li>
+                </ul>
+            </nav>
+        </div>
     </header>
     <main class="container">
         <section id="home">
@@ -304,7 +330,7 @@ async def start_command(client, message):
         </section>
     </main>
     <script>
-        // Improved 
+        // Improved star animation
         const canvas = document.getElementById('stars');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
@@ -356,7 +382,7 @@ async def start_command(client, message):
             canvas.height = window.innerHeight;
         });
 
-        // Copy button
+        // Copy button functionality
         document.querySelectorAll('.copy-btn').forEach(button => {
             button.addEventListener('click', () => {
                 const codeBlock = button.nextElementSibling;
@@ -380,6 +406,28 @@ async def start_command(client, message):
                 document.querySelector(this.getAttribute('href')).scrollIntoView({
                     behavior: 'smooth'
                 });
+            });
+        });
+
+        // Menu functionality
+        const menuBtn = document.getElementById('menuBtn');
+        const navMenu = document.getElementById('navMenu');
+
+        menuBtn.addEventListener('click', () => {
+            navMenu.classList.toggle('show');
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (event) => {
+            if (!event.target.closest('nav')) {
+                navMenu.classList.remove('show');
+            }
+        });
+
+        // Close menu when a link is clicked
+        navMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                navMenu.classList.remove('show');
             });
         });
     </script>
