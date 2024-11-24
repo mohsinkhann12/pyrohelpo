@@ -26,10 +26,6 @@ A powerful and flexible pagination library for Pyrogram bots that automatically 
 pip install pyrohelpo
 ```
 
-```markdown file="README.md"
-...
-```
-
 ## Usage ⚙️
 
 ### Basic Setup
