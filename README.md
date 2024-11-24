@@ -5,6 +5,7 @@ A powerful and flexible pagination library for Pyrogram bots that automatically 
 ![Python](https://img.shields.io/badge/Python-3.7%2B-blue)
 ![Pyrogram](https://img.shields.io/badge/Pyrogram-2.0%2B-green)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
+![PyPI Downloads](https://static.pepy.tech/badge/pyrohelpo)
 
 ## Features ✨
 
