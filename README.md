@@ -1,3 +1,4 @@
+```markdown
 # Helpo 📚
 
 A powerful and flexible pagination library for Pyrogram bots that automatically handles help commands and module organization.
@@ -213,4 +214,4 @@ If you encounter any issues or have questions, please open an issue on the [GitH
 ---
 
 Made with ❤️ by the Helpo team
-
+```
