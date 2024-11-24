@@ -1,4 +1,3 @@
-```markdown
 # Helpo 📚
 
 A powerful and flexible pagination library for Pyrogram bots that automatically handles help commands and module organization.
@@ -17,6 +16,9 @@ A powerful and flexible pagination library for Pyrogram bots that automatically 
 - 🔌 Easy integration with existing Pyrogram bots
 - 📝 Support for rich media in help messages (photos, videos)
 - 🔗 Deep linking support for direct access to help menus
+- 🌐 Group chat support with private message options
+- 🎭 Flexible parse mode selection
+- 🖼️ Media support with photo and video options
 
 ## Installation 🚀
 
@@ -24,13 +26,33 @@ A powerful and flexible pagination library for Pyrogram bots that automatically 
 pip install pyrohelpo
 ```
 
+```markdown file="README.md"
+...
+```
+
 ## Usage ⚙️
 
-### Initialize the Helpo instance
+### Basic Setup
 
 ```python
+from pyrogram import Client
 from Helpo import Helpo
+from pyrogram.enums import ParseMode
 
+# Initialize your Pyrogram client
+app = Client("my_bot")
+
+# Initialize Helpo
+helpo = Helpo(
+    client=app,
+    modules_path="plugins",
+    buttons_per_page=6
+)
+```
+
+### Advanced Configuration
+
+```python
 custom_texts = {
     "help_menu_title": "**🛠 Custom Help Menu**",
     "help_menu_intro": "Available modules ({count}):\n{modules}\n\nTap on a module to explore.",
@@ -42,161 +64,167 @@ custom_texts = {
     "next_button": "➡️ Next Page",
     "support_button": "💬 Contact Support",
     "support_url": "https://t.me/YourSupportBot",
+    "group_help_message": "Click The Button To Access Help",
+    "group_pvt_button": "See In Private",
+    "group_open_here": "Open Here"
 }
 
-pagination = Helpo(
-    client=bot,
-    modules_path="fwd/plugins",
-    buttons_per_page=9,
+helpo = Helpo(
+    client=app,
+    modules_path="plugins",
+    buttons_per_page=6,
     texts=custom_texts,
     help_var="HELP",
     module_var="MODULE",
-    video="" # pass video path/url 
-    photo="" # pass photo path/url
-    # only one type of media support at one time pass photo else video to use them in /help command 
-    parse_mode=ParseMode.HTML # pass if want to change parse mode Default to markdown         
-    disable_web_page_preview=False # Deafuults to True
+    photo="path/to/photo.jpg",  # Optional: Add photo to help messages
+    video="path/to/video.mp4",  # Optional: Add video to help messages
+    parse_mode=ParseMode.HTML,  # Optional: Change parse mode (default: MARKDOWN)
+    disable_web_page_preview=False  # Optional: Enable web preview (default: True)
 )
 ```
 
-### Set up help and module for each Python file in the modules path
+### Module Setup
+
+Create Python files in your modules directory with the following structure:
 
 ```python
-MODULE = "HELPO"
-
-HELP = "GO GOA GONE"  # You can use docstrings too
+MODULE = "Admin"  # Module name displayed in help menu
+HELP = """
+**Admin Commands**
+/ban - Ban a user
+/unban - Unban a user
+/mute - Mute a user
+/unmute - Unmute a user
+"""
 ```
 
-### Using a custom class
+### Custom Class Implementation
 
 ```python
-from pyrogram import Client
-from Helpo import Helpo
-
 class Bot(Client):
     def __init__(self):
         super().__init__(
-            "Hoshi-new",
+            "my_bot",
             api_id=API_ID,
             api_hash=API_HASH,
-            bot_token=TOKEN,
-            plugins=dict(root="shivu"),
+            bot_token=BOT_TOKEN
         )
         self.helpo = Helpo(
             client=self,
-            modules_path="shivu/modules",
+            modules_path="plugins",
             buttons_per_page=6,
-            texts=custom_texts,
+            texts=custom_texts
         )
 
     async def start(self):
         await super().start()
-        print("Pyro Bot Started")
-        print(f"Helpo Initialized with Modules: {', '.join(self.helpo.modules.keys())}")
+        print("Bot Started")
+        print(f"Loaded Modules: {', '.join(self.helpo.modules.keys())}")
 
     async def stop(self):
         await super().stop()
-        print("Pyro Bot Stopped")
+        print("Bot Stopped")
 ```
 
-### Deep linking support
+### Group Chat Support
+
+The new Helpo version automatically handles group chats by providing options to:
+
+- View help menu in private chat
+- View help menu directly in the group
+- Customize group chat behavior through texts dictionary
+
+
+### Deep Linking Support
 
 ```python
-@bot.on_message(filters.command("start"))
+@app.on_message(filters.command("start"))
 async def start_command(client, message):
     if len(message.text.split()) > 1:
-        name = message.text.split(None, 1)[1]
-        if name.startswith("help"):
-            await bot.show_help_menu(message.chat.id, page=1)
-```
-
-### Adding a help button anywhere without callback query
-
-```python
-from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from . import pagination  # Import your Helpo instance
-
-@bot.on_message(filters.command("start"))
-async def start_command(client, message):
-    keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton("Help", callback_data="global_help")]
-    ])
-    await message.reply("Welcome! Click the button below for help.", reply_markup=keyboard)
+        param = message.text.split(None, 1)[1]
+        if param == "help":
+            await client.show_help_menu(message.chat.id)
+    else:
+        await message.reply("Welcome! Use /help to see available commands.")
 ```
 
 ## Customization Options 🎨
 
-Helpo offers various customization options to tailor the help menu to your bot's needs:
+### Available Text Customizations
 
-- `buttons_per_page`: Set the number of buttons displayed per page (default: 6)
-- `texts`: Customize all text messages and button labels
-- `help_var` and `module_var`: Set custom variable names for help text and module names
-- `photo` and `video`: Add rich media to your help messages
-- `parse_mode`: Set the parse mode for help messages (default: ParseMode.MARKDOWN)
-- `disable_web_page_preview`: Enable or disable web page previews in help messages
+All text elements can be customized through the `texts` dictionary:
 
-# Image Gallery 
+- `help_menu_title`: Title of the main help menu
+- `help_menu_intro`: Introduction text with module count
+- `module_help_title`: Title for individual module help
+- `module_help_intro`: Introduction text for module help
+- `no_modules_loaded`: Message when no modules are found
+- `back_button`: Text for back button
+- `prev_button`: Text for previous page button
+- `next_button`: Text for next page button
+- `support_button`: Text for support button
+- `support_url`: URL for support button
+- `group_help_message`: Message shown in groups
+- `group_pvt_button`: Text for private chat button
+- `group_open_here`: Text for in-group help button
 
-<details>
-<summary>Help menu using video</summary>
 
-![Help menu using video](https://i.ibb.co/W6GSqRx/b8a4679a3f10.jpg)
-Description: This menu displays video tutorials to help users.
+### Media Support
 
-</details>
+You can enhance your help menu with either photos or videos:
 
-<details>
-<summary>Help menu using only text</summary>
+```python
+helpo = Helpo(
+    client=app,
+    modules_path="plugins",
+    photo="https://example.com/help-banner.jpg"  # OR
+    video="https://example.com/help-tutorial.mp4"
+)
+```
 
-![Help menu using only text](https://i.ibb.co/Ct5P1jQ/68a1de1130d3.jpg)
-Description: This menu uses text-based instructions for simplicity.
-
-</details>
-
-<details>
-<summary>Help menu using photo</summary>
-
-![Help menu using photo](https://i.ibb.co/H70SLgQ/741d52da8c46.jpg)
-Description: This menu uses images to visually assist users.
-
-</details>
-
-<details>
-<summary>Help menu of a module</summary>
-
-![Help menu of a module](https://i.ibb.co/BzFD1kj/ad4c32676c6e.jpg)
-Description: This menu shows a module-specific help interface.
-
-</details>
+Note: You can only use either photo or video, not both simultaneously.
 
 ## Methods and Attributes 📚
 
 ### Helpo Class
 
 #### Attributes:
-- `client`: The Pyrogram Client instance
-- `modules_path`: Path to the modules directory
-- `buttons_per_page`: Number of buttons per page in the help menu
-- `help_var`: Variable name for help text in modules
-- `module_var`: Variable name for module name in modules
-- `photo`: Optional photo to be used in help messages
-- `video`: Optional video to be used in help messages
-- `parse_mode`: Parse mode for help messages
-- `disable_web_page_preview`: Whether to disable web page previews in help messages
-- `texts`: Dictionary of customizable text strings
 
-### Error Handling
+- `client`: Pyrogram Client instance
+- `modules_path`: Path to modules directory
+- `buttons_per_page`: Number of buttons per page
+- `help_var`: Variable name for help text (default: "**HELP**")
+- `module_var`: Variable name for module name (default: "**MODULE**")
+- `photo`: Optional photo URL/path
+- `video`: Optional video URL/path
+- `parse_mode`: Message parse mode
+- `disable_web_page_preview`: Web preview setting
+- `texts`: Customizable text dictionary
 
-Helpo includes error handling for various scenarios:
+
+#### Methods:
+
+- `load_modules()`: Loads all modules from the specified path
+- `show_help_menu()`: Displays the main help menu
+- `show_module_help()`: Shows help for a specific module
+
+
+## Error Handling
+
+Helpo includes comprehensive error handling for:
+
 - Invalid module files
-- Missing required attributes in modules
-- Failed module loading
-- Message sending failures
+- Missing required attributes
+- Media loading failures
+- Message sending errors
+- Callback query processing
+
 
 ## Contributors 👥
 
 - [vishal-1756](https://github.com/vishal-1756)
 - [siyu-xd](https://github.com/siyu-xd)
+
 
 ## License 📄
 
@@ -204,14 +232,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Support 🤝
 
-If you encounter any issues or have questions, please open an issue on the [GitHub repository](https://github.com/Vishal-1756/Helpo) or join our [support chat](https://t.me/Blank_Advice).
+Need help? Join our [support chat](https://t.me/Blank_Advice) or create an issue on our [GitHub repository](https://github.com/Vishal-1756/Helpo).
 
-## Acknowledgements 🙏
-
-- [Pyrogram](https://docs.pyrogram.org/) - The awesome MTProto library for Python
-- All contributors who have helped this project grow
+## Image Gallery 🖼️
 
 ---
 
 Made with ❤️ by the Helpo team
-```
