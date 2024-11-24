@@ -44,7 +44,11 @@ class Helpo:
             "prev_button": "⬅️ Previous",
             "next_button": "Next ➡️",
             "support_button": "👥 Support",
-            "support_url": "https://t.me/Xlzeo"
+            "support_url": "https://t.me/Xlzeo",
+            "group_help_message": "Click The Button To Access Help",
+            "group_pvt_button" : "See In Pvt",
+            "group_pvt_url": "https://t.me/{(self.client.get_me()).username}?start=help",
+            "group_open_here": "Open Here"
         }
         if texts:
             self.texts.update(texts)
@@ -74,7 +78,26 @@ class Helpo:
     def monkeypatch_client(self):
         @self.client.on_message(filters.command("help"))
         async def help_command(client, message):
-            await self.show_help_menu(message.chat.id)
+            if message.chat.type == "ChatType.SUPERGROUP":
+                buttons = [
+                    [
+                        InlineKeyboardButton(
+                            self.texts["group_pvt_button"],
+                            url=fself.texts["group_pvt_url"]
+                        ),
+                        InlineKeyboardButton(
+                            self.texts["group_open_here"],
+                            callback_data="global_help"
+                        ),
+                    ]
+                ]
+                keyboard = InlineKeyboardMarkup(buttons)
+                await message.reply(
+                    self.texts["group_help_message"],
+                    reply_markup=keyboard
+                )
+            else:
+                await self.show_help_menu(message.chat.id)
        
         @self.client.on_callback_query(filters.regex(r'^help_'))
         async def help_button(client, callback_query: CallbackQuery):
