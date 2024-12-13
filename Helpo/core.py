@@ -79,18 +79,41 @@ class Helpo:
         async def help_command(client, message):
             # Extract the command arguments
             args = message.text.split(maxsplit=1)
-            module_name = args[1] if len(args) > 1 else None
+            module_name = args[1].strip().lower() if len(args) > 1 else None  # Normalize to lowercase
 
             if module_name:
-                # Check if the module exists
-                module = self.modules.get(module_name)
+                # Check if the module exists (case-insensitive)
+                module = next((m for k, m in self.modules.items() if k.lower() == module_name), None)
                 if module:
-                    # Send the specific module's help
+                    # Prepare help text
                     text = f"{self.texts['module_help_title'].format(module_name=module['name'])}\n\n{self.texts['module_help_intro'].format(help_text=module['help'])}"
                     keyboard = InlineKeyboardMarkup(
                         [[InlineKeyboardButton(self.texts["back_button"], callback_data="help_back")]]
                     )
-                    await message.reply(text, reply_markup=keyboard)
+
+                    # Send the specific module's help using the picture/video if set
+                    if self.photo:
+                        await client.send_photo(
+                            chat_id=message.chat.id,
+                            photo=self.photo,
+                            caption=text,
+                            reply_markup=keyboard,
+                            parse_mode=self.parse_mode
+                        )
+                    elif self.video:
+                        await client.send_video(
+                            chat_id=message.chat.id,
+                            video=self.video,
+                            caption=text,
+                            reply_markup=keyboard,
+                            parse_mode=self.parse_mode
+                        )
+                    else:
+                        await message.reply(
+                            text,
+                            reply_markup=keyboard,
+                            parse_mode=self.parse_mode
+                        )
                 else:
                     # Inform user that the module does not exist
                     await message.reply("Module not found! Please check the module name and try again.")
@@ -116,6 +139,7 @@ class Helpo:
                     )
                 else:
                     await self.show_help_menu(message.chat.id)
+
 
        
         @self.client.on_callback_query(filters.regex(r'^help_'))
