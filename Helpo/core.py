@@ -77,26 +77,46 @@ class Helpo:
     def monkeypatch_client(self):
         @self.client.on_message(filters.command("help"))
         async def help_command(client, message):
-            if message.chat.type in [ChatType.SUPERGROUP, ChatType.GROUP]:
-                buttons = [
-                    [
-                        InlineKeyboardButton(
-                            self.texts["group_pvt_button"],
-                            url=self.texts["group_pvt_url"]
-                        ),
-                        InlineKeyboardButton(
-                            self.texts["group_open_here"],
-                            callback_data="global_help"
-                        ),
-                    ]
-                ]
-                keyboard = InlineKeyboardMarkup(buttons)
-                await message.reply(
-                    self.texts["group_help_message"],
-                    reply_markup=keyboard
-                )
+            # Extract the command arguments
+            args = message.text.split(maxsplit=1)
+            module_name = args[1] if len(args) > 1 else None
+
+            if module_name:
+                # Check if the module exists
+                module = self.modules.get(module_name)
+                if module:
+                    # Send the specific module's help
+                    text = f"{self.texts['module_help_title'].format(module_name=module['name'])}\n\n{self.texts['module_help_intro'].format(help_text=module['help'])}"
+                    keyboard = InlineKeyboardMarkup(
+                        [[InlineKeyboardButton(self.texts["back_button"], callback_data="help_back")]]
+                    )
+                    await message.reply(text, reply_markup=keyboard)
+                else:
+                    # Inform user that the module does not exist
+                    await message.reply("Module not found! Please check the module name and try again.")
             else:
-                await self.show_help_menu(message.chat.id)
+                # Show the default help menu
+                if message.chat.type in [ChatType.SUPERGROUP, ChatType.GROUP]:
+                    buttons = [
+                        [
+                            InlineKeyboardButton(
+                                self.texts["group_pvt_button"],
+                                url=self.texts["group_pvt_url"]
+                            ),
+                            InlineKeyboardButton(
+                                self.texts["group_open_here"],
+                                callback_data="global_help"
+                            ),
+                        ]
+                    ]
+                    keyboard = InlineKeyboardMarkup(buttons)
+                    await message.reply(
+                        self.texts["group_help_message"],
+                        reply_markup=keyboard
+                    )
+                else:
+                    await self.show_help_menu(message.chat.id)
+
        
         @self.client.on_callback_query(filters.regex(r'^help_'))
         async def help_button(client, callback_query: CallbackQuery):
